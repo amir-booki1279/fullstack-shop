@@ -102,6 +102,7 @@ import { registerUser } from '@/actions/auth'
         </CardContent>
       </Card>
     </main>
-) }          
+) 
+}          
 
 export default RegisterPage

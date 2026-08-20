@@ -8,3 +8,13 @@ export const registerSchema = z.object({
 })
 
 export type RegisterFormData = z.infer<typeof registerSchema>
+
+
+
+export const loginSchema = z.object({
+      email : z.email('ایمیل معتبر نیست'),
+    password : z.string().min(1,'رمز عبور وارد کنید  ')
+})
+
+
+export type LoginFormData = z.infer<typeof loginSchema>
