@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoginFormData, loginSchema } from "@/lib/validation/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { loginUser } from "@/actions/auth";
 
 function LoginPage() {
      const {
@@ -20,7 +21,17 @@ function LoginPage() {
 
  const onSubmit = async (data: LoginFormData) => {
    
-    console.log(data);
+    const result = await loginUser(data)
+        if(result.error){
+          setError('email',{
+            type:'server',
+            message:result.error
+          })
+          return;
+    
+        }
+        console.log(result);
+        
     
   };
 
