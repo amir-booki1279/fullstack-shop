@@ -34,3 +34,11 @@ export async function registerUser(data:{
     }
 
 }
+
+export async function loginUser(data:{
+    name:string,
+    email:string,
+    password:string
+}){
+
+   } 
