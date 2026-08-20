@@ -2,6 +2,7 @@
 
 import prisma from "@/prisma/client";
 import bcrypt from "bcrypt";
+import { cookies } from "next/headers";
 
 export async function registerUser(data: {
   name: string;
@@ -53,13 +54,24 @@ export async function loginUser(data: {
         }
     }
 
+    const session = await prisma.session.create({
+        data : {
+            userId : user.id,
+            expiresAt : new Date(Date.now()+7*24*60*60*1000)
+        }
+    })
+    const cookieStore = await cookies();
+
+    cookieStore.set('session',session.id,{
+        httpOnly:true,
+        secure :process.env.NODE_ENV==='production',
+        sameSite:'lax',
+        expires:session.expiresAt,
+        path:'/'
+    })
+
     return{
         success:true,
-        user : {
-            id : user.id,
-            name : user.name,
-            email : user.email,
-            role : user.role
-        }
+       
     }
 }
