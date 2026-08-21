@@ -4,6 +4,7 @@ import React from "react";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import QueryProvider from "@/components/providers/query-provider";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: LayoutProps) {
         
         <main>
           
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
 
         </main>
 
