@@ -1,9 +1,10 @@
-import { getCurrentUser } from '@/lib/auth';
-import React from 'react';
-
+import {requireUser } from '@/lib/auth';
+import {Button} from '@/components/ui/button'
+import { logoutUser } from '@/actions/auth';
+ 
 async function ProfilePage() {
 
-    const user = await getCurrentUser();
+    const user = await requireUser();
 
     if(!user) return <div>وارد نشدید</div>
 
@@ -16,6 +17,13 @@ async function ProfilePage() {
             <p>{user.email}</p>
 
             <p>Role : {user.role}</p>
+
+            <form action={logoutUser}>
+                <Button type='submit'>
+                    خروج
+                </Button>
+                
+            </form>
         </div>
     );
 }

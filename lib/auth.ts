@@ -1,5 +1,6 @@
 import prisma from "@/prisma/client";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 
 
@@ -25,4 +26,21 @@ export async function getCurrentUser(){
 
     return session.user;
 
+
+}
+
+export async function requireUser(){
+    const user = await getCurrentUser()
+
+    if (!user) redirect('/login');
+
+    return user;
+}
+
+export async function requireAdmin(){
+    const user = await getCurrentUser()
+
+    if (user?.role !== 'ADMIN') redirect('/profile');
+
+    return user;
 }

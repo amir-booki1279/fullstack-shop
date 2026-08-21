@@ -3,6 +3,7 @@
 import prisma from "@/prisma/client";
 import bcrypt from "bcrypt";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function registerUser(data: {
   name: string;
@@ -74,4 +75,19 @@ export async function loginUser(data: {
         success:true,
        
     }
+}
+
+export async function logoutUser(){
+    const cookieStore = await cookies();
+
+    const sessionId = cookieStore.get('session')?.value;
+
+    if(sessionId){
+      await prisma.session.delete({
+        where :{id:sessionId}
+      });
+
+    }
+    cookieStore.delete('session');
+    redirect('/login');
 }
