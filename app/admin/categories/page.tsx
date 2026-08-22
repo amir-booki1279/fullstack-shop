@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { getCategories } from "@/lib/api/categories";
 import { Category } from "@/types/category";
+import {Pencil, Trash2} from 'lucide-react'
 import { useQuery } from "@tanstack/react-query";
 
 export default  function CategoriesPage() {
@@ -26,17 +28,17 @@ export default  function CategoriesPage() {
   if (isError) return <div>خطا در دیافت اطلاعات</div>;
 
   return (
-    <main className="p-10">
-      <div className="mb-6">
+    <main className="p-10 max-w-5xl mx-auto">
+      <div className="mb-6 flex justify-center">
         <h1 className="text-2xl font-bold">مدیریت دسته بندی</h1>
       </div>
 
-      <Table>
+      <Table dir="rtl" className="w-full text-xl">
         <TableHeader>
           <TableRow>
-            <TableHead>نام</TableHead>
-            <TableHead>تاریخ ایجاد</TableHead>
-            <TableHead>عملیات</TableHead>
+            <TableCell>نام</TableCell>
+            <TableCell>تاریخ ایجاد</TableCell>
+            <TableCell>عملیات</TableCell>
           </TableRow>
         </TableHeader>
 
@@ -49,7 +51,14 @@ export default  function CategoriesPage() {
                   "fa-IR",
                 )}
               </TableCell>
-              <TableCell>ویرایش</TableCell>
+              <TableCell className="flex gap-2">
+                <Button variant={"outline"} size={'icon'}>
+                    <Pencil className="h-4 w-4"/>
+                </Button>
+                 <Button variant={"destructive"} size={'icon'}>
+                    <Trash2 className="h-4 w-4"/>
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
