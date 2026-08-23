@@ -5,7 +5,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -13,8 +12,13 @@ import { deleteCategoy, getCategories } from "@/lib/api/categories";
 import { Category } from "@/types/category";
 import {Pencil, Trash2} from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export default  function CategoriesPage() {
+
+  const [selectedCategory,setSelectedCategory] = useState<Category|null>(null)
+
   const {
     data: categories,
     isLoading,
@@ -66,7 +70,7 @@ export default  function CategoriesPage() {
                 <Button variant={"outline"} size={'icon'}>
                     <Pencil className="h-4 w-4"/>
                 </Button>
-                 <Button onClick={()=>deleteMutation.mutate(category.id)} 
+                 <Button onClick={()=>setSelectedCategory(category)} 
                  disabled={deleteMutation.isPending} variant={"destructive"} size={'icon'}>
                     <Trash2 className="h-4 w-4"/>
                 </Button>
@@ -75,6 +79,43 @@ export default  function CategoriesPage() {
           ))}
         </TableBody>
       </Table>
+
+      <AlertDialog
+        open = {!!selectedCategory}
+        onOpenChange={(open)=>{
+          if(!open){
+            setSelectedCategory(null)
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+                حذف دسته بندی
+            </AlertDialogTitle>
+             <AlertDialogDescription>
+                 آیا مطمنی میخواهی دسته بندی {" "}
+                 <strong>{selectedCategory?.name}</strong>{" "}
+                 را حذف کنی؟
+             </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              لغو
+            </AlertDialogCancel>
+            <AlertDialogAction
+             onClick={()=>{if(selectedCategory){
+              deleteMutation.mutate(selectedCategory.id);
+              setSelectedCategory(null)
+             }}}
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+
+      </AlertDialog>
     </main>
   );
 }
