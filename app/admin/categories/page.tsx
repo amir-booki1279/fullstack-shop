@@ -9,10 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getCategories } from "@/lib/api/categories";
+import { deleteCategoy, getCategories } from "@/lib/api/categories";
 import { Category } from "@/types/category";
 import {Pencil, Trash2} from 'lucide-react'
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default  function CategoriesPage() {
   const {
@@ -23,6 +23,17 @@ export default  function CategoriesPage() {
     queryKey: ["categories"],
     queryFn: getCategories,
   });
+
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+    mutationFn : deleteCategoy,
+
+    onSuccess:()=>{
+      queryClient.invalidateQueries({
+        queryKey : ['categories']
+      })
+    }
+  })
 
   if (isLoading) return <div>درحال دریافت دسته بندی ها...</div>;
   if (isError) return <div>خطا در دیافت اطلاعات</div>;
@@ -55,7 +66,8 @@ export default  function CategoriesPage() {
                 <Button variant={"outline"} size={'icon'}>
                     <Pencil className="h-4 w-4"/>
                 </Button>
-                 <Button variant={"destructive"} size={'icon'}>
+                 <Button onClick={()=>deleteMutation.mutate(category.id)} 
+                 disabled={deleteMutation.isPending} variant={"destructive"} size={'icon'}>
                     <Trash2 className="h-4 w-4"/>
                 </Button>
               </TableCell>

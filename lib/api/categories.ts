@@ -10,3 +10,11 @@ export async function getCategories():Promise<Category[]>{
 
     return res.data
 }
+
+
+export async function deleteCategoy(id:number){
+     
+   await api.delete(`/categories/${id}`);
+
+    
+}
