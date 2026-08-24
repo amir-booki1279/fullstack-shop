@@ -8,16 +8,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { deleteCategoy, getCategories } from "@/lib/api/categories";
+import { deleteCategoy, getCategories, updateCategory } from "@/lib/api/categories";
 import { Category } from "@/types/category";
 import {Pencil, Trash2} from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { string } from "zod";
+import { Input } from "@/components/ui/input";
 
 export default  function CategoriesPage() {
 
   const [selectedCategory,setSelectedCategory] = useState<Category|null>(null)
+  const [editCategory,setEditCategory] = useState<Category|null>(null)
+  const [editName,setEditName] = useState('')
+
+
 
   const {
     data: categories,
@@ -36,6 +42,18 @@ export default  function CategoriesPage() {
       queryClient.invalidateQueries({
         queryKey : ['categories']
       })
+    }
+  })
+
+  const updateMutation = useMutation({
+    mutationFn : ({id,name}:{id:number,name:string})=> updateCategory(id,name),
+    onSuccess : () => {
+      queryClient.invalidateQueries({
+        queryKey : ['categories']
+
+      })
+      setEditCategory(null);
+      setEditName('')
     }
   })
 
@@ -67,7 +85,11 @@ export default  function CategoriesPage() {
                 )}
               </TableCell>
               <TableCell className="flex gap-2">
-                <Button variant={"outline"} size={'icon'}>
+                <Button onClick={()=>{
+                  setEditCategory(category)
+                  setEditName(category.name) 
+                }}
+                 variant={"outline"} size={'icon'}>
                     <Pencil className="h-4 w-4"/>
                 </Button>
                  <Button onClick={()=>setSelectedCategory(category)} 
@@ -111,6 +133,51 @@ export default  function CategoriesPage() {
              }}}
             >
               حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+
+      </AlertDialog>
+
+       <AlertDialog
+        open = {!!editCategory}
+        onOpenChange={(open)=>{
+          if(!open){
+            setEditCategory(null)
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+                ویرایش دسته بندی
+            </AlertDialogTitle>
+             <AlertDialogDescription>
+                نام دسته بندی را تغییر دهید
+             </AlertDialogDescription>
+          </AlertDialogHeader>
+
+              <Input value={editName} onChange={(e)=>setEditName(e.target.value)}
+              placeholder="نام دسته بندی" />
+               
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              لغو
+            </AlertDialogCancel>
+            <AlertDialogAction
+            disabled = {updateMutation.isPending || !editName.trim()}
+             onClick={(e)=>{
+              e.preventDefault();
+
+              if(!editCategory) return;
+
+              updateMutation.mutate({
+                id:editCategory.id,
+                name:editName.trim()
+              })
+             }}
+            >
+              {updateMutation.isPending ? <span>درحال ذخیره...</span> : <span>ذخیره</span>}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
