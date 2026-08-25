@@ -16,6 +16,7 @@ import { useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { string } from "zod";
 import { Input } from "@/components/ui/input";
+import AppDialog from "@/components/shared/AppDialog";
 
 export default  function CategoriesPage() {
 
@@ -102,70 +103,62 @@ export default  function CategoriesPage() {
         </TableBody>
       </Table>
 
-      <AlertDialog
+     
+
+      <AppDialog 
         open = {!!selectedCategory}
         onOpenChange={(open)=>{
           if(!open){
             setSelectedCategory(null)
           }
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-                حذف دسته بندی
-            </AlertDialogTitle>
-             <AlertDialogDescription>
-                 آیا مطمنی میخواهی دسته بندی {" "}
-                 <strong>{selectedCategory?.name}</strong>{" "}
-                 را حذف کنی؟
-             </AlertDialogDescription>
-          </AlertDialogHeader>
+        title=" حذف دسته بندی"
+        description={` آیا مطمنی میخواهی دسته بندی 
+                 ${selectedCategory?.name}
+                 را حذف کنی؟`}
+                 footer ={
+                  <>
+                   <Button onClick={()=>{
+                  setSelectedCategory(null)
+                  
+                }}
+                 variant={"outline"} size={'icon'}>
+                   لغو
+                </Button>
+                  <Button onClick={()=>{
+                    if(!selectedCategory) return;
+                    deleteMutation.mutate(selectedCategory.id);
+                    setSelectedCategory(null);
+                  
+                  }} 
+                 disabled={deleteMutation.isPending} variant={"destructive"} size={'icon'}>
+                    
+                    {deleteMutation.isPending ? <span>درحال حذف...</span>:<span>حذف</span>}
+                </Button>
+                  </>
+                 }
+      />
 
-          <AlertDialogFooter>
-            <AlertDialogCancel>
-              لغو
-            </AlertDialogCancel>
-            <AlertDialogAction
-             onClick={()=>{if(selectedCategory){
-              deleteMutation.mutate(selectedCategory.id);
-              setSelectedCategory(null)
-             }}}
-            >
-              حذف
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-
-      </AlertDialog>
-
-       <AlertDialog
+      <AppDialog
         open = {!!editCategory}
-        onOpenChange={(open)=>{
+         onOpenChange={(open)=>{
           if(!open){
             setEditCategory(null)
           }
         }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-                ویرایش دسته بندی
-            </AlertDialogTitle>
-             <AlertDialogDescription>
-                نام دسته بندی را تغییر دهید
-             </AlertDialogDescription>
-          </AlertDialogHeader>
-
-              <Input value={editName} onChange={(e)=>setEditName(e.target.value)}
-              placeholder="نام دسته بندی" />
-               
-          <AlertDialogFooter>
-            <AlertDialogCancel>
+        title=" ویرایش دسته بندی"
+        description=" نام دسته بندی را تغییر دهید"
+        footer={
+          <>
+           <Button
+           onClick={()=>setEditCategory(null)}
+          variant={'outline'}>
               لغو
-            </AlertDialogCancel>
-            <AlertDialogAction
-            disabled = {updateMutation.isPending || !editName.trim()}
+          </Button>
+          
+          <Button
+          variant={'outline'}
+           disabled = {updateMutation.isPending || !editName.trim()}
              onClick={(e)=>{
               e.preventDefault();
 
@@ -176,13 +169,21 @@ export default  function CategoriesPage() {
                 name:editName.trim()
               })
              }}
-            >
-              {updateMutation.isPending ? <span>درحال ذخیره...</span> : <span>ذخیره</span>}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
+          >
+                    {updateMutation.isPending ? <span>درحال ذخیره...</span>:<span>ذخیره</span>}
 
-      </AlertDialog>
+          </Button>
+          </>
+        }
+      >
+       <Input
+       value={editName}
+       onChange={(e)=>setEditName(e.target.value)}
+       placeholder="نام دسته بندی"
+       />
+      </AppDialog>
+
+    
     </main>
   );
 }
